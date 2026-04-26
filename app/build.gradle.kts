@@ -35,6 +35,7 @@ android {
 }
 
 dependencies {
+    implementation("com.github.bumptech.glide:glide:4.16.0")
     // 核心与UI库
     implementation("androidx.core:core:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -51,6 +52,9 @@ dependencies {
 
     // Room (Java 环境必须使用 annotationProcessor)
     implementation("androidx.room:room-runtime:2.6.1")
+    implementation(libs.legacy.support.v4)
+    implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
     annotationProcessor("androidx.room:room-compiler:2.6.1")
 
     // Navigation

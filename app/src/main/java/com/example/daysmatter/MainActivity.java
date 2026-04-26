@@ -16,6 +16,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.customview.widget.Openable;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
@@ -28,7 +29,8 @@ import com.example.daysmatter.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-
+    public static String currentCategory="全部";
+    private AppBarConfiguration appBarConfiguration;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,26 +53,20 @@ public class MainActivity extends AppCompatActivity {
         }
             }
         });
-        //滑动窗口
+      //定义顶层页面 (显示菜单图标)
         setSupportActionBar(binding.toolbar);
-        ActionBar actionBar=getSupportActionBar();
-        if(actionBar!=null){
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.menu);
-        }
+        appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
+        ).setOpenableLayout(binding.drawerLayout).build();
 
+        // 自动绑定 (关键：它会自动识别什么时候显示菜单，什么时候显示返回)
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
     }
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // 捕捉点击图标的事件
-            case android.R.id.home:
-                // 弹出抽屉菜单 (GravityCompat.START 表示从左侧滑出)
-                binding.drawerLayout.openDrawer(GravityCompat.START);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+    public boolean onSupportNavigateUp() {
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        // 这里传入之前定义的 appBarConfiguration
+        return NavigationUI.navigateUp(navController, appBarConfiguration) || super.onSupportNavigateUp();
     }
-
 }

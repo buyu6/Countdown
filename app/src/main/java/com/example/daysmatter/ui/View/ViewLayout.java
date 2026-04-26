@@ -36,34 +36,27 @@ public class ViewLayout extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int leftWidth = 0;
-        int leftHeight = 0;
-        int rightWidth = 0;
-        int rightHeight = 0;
+        int count = getChildCount();
 
-        for (int i = 0; i < getChildCount(); i++) {
+        int leftWidth = 0, leftHeight = 0, rightWidth = 0, rightHeight = 0;
+        for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
             measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
             MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
-
-            int childWidth = child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
-            int childHeight = child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
+            int cw = child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
+            int ch = child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
 
             if (i == 0 || i == 2) {
-                leftWidth = Math.max(leftWidth, childWidth);
-                leftHeight += childHeight;
+                leftWidth = Math.max(leftWidth, cw);
+                leftHeight += ch;
             } else if (i == 1 || i == 3) {
-                rightWidth += childWidth;
-                rightHeight = Math.max(rightHeight, childHeight);
+                rightWidth += cw;
+                rightHeight = Math.max(rightHeight, ch);
             }
         }
-
-        int totalWidth = leftWidth + rightWidth + getPaddingLeft() + getPaddingRight();
-        int totalHeight = Math.max(leftHeight, rightHeight) + getPaddingTop() + getPaddingBottom();
-
         setMeasuredDimension(
-                resolveSize(totalWidth, widthMeasureSpec),
-                resolveSize(totalHeight, heightMeasureSpec)
+                resolveSize(leftWidth + rightWidth + getPaddingLeft() + getPaddingRight(), widthMeasureSpec),
+                resolveSize(Math.max(leftHeight, rightHeight) + getPaddingTop() + getPaddingBottom(), heightMeasureSpec)
         );
     }
 
@@ -165,6 +158,8 @@ public class ViewLayout extends ViewGroup {
                 itemView.setOnClickListener(v -> listener.onClick(msg));
                 addView(itemView);
             }
+            requestLayout();
+            invalidate();
         }
     }
 }

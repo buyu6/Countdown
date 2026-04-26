@@ -8,13 +8,20 @@
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.example.daysmatter.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:label="Countdown · 倒数日"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_navigation_home_to_addMsgFragment"
+            app:destination="@id/addMsgFragment" />
+        <action
+            android:id="@+id/action_navigation_home_to_showMsgFragment"
+            app:destination="@id/showMsgFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.example.daysmatter.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
+        android:label="分类"
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
@@ -25,7 +32,7 @@
     <fragment
         android:id="@+id/launchFragemnt"
         android:name="com.example.daysmatter.ui.launch.LaunchFragemnt"
-        android:label="fragment_launch_fragemnt"
+        android:label="Countdown · 倒数日"
         tools:layout="@layout/fragment_launch_fragemnt" >
         <action
             android:id="@+id/action_launchFragemnt_to_navigation_home"
@@ -34,4 +41,45 @@
             android:id="@+id/action_launchFragemnt_to_navigation_home2"
             app:destination="@id/navigation_home" />
     </fragment>
+    <fragment
+        android:id="@+id/addMsgFragment"
+        android:name="com.example.daysmatter.ui.addMsg.AddMsgFragment"
+        android:label="Countdown · 倒数日" >
+        <action
+            android:id="@+id/action_addMsgFragment_to_showMsgFragment"
+            app:destination="@id/showMsgFragment" />
+        <action
+            android:id="@+id/action_addMsgFragment_to_settingCategoryFragment"
+            app:destination="@id/settingCategoryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/showMsgFragment"
+        android:name="com.example.daysmatter.ui.showMsg.ShowMsgFragment"
+        tools:layout="@layout/fragment_show_msg"
+        android:label="Countdown · 倒数日">
+        <action
+            android:id="@+id/action_showMsgFragment_to_addMsgFragment"
+            app:destination="@id/addMsgFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingCategoryFragment"
+        android:name="com.example.daysmatter.ui.settingCategory.SettingCategoryFragment"
+        android:label="Countdown · 倒数日" >
+        <action
+            android:id="@+id/action_settingCategoryFragment_to_showCategoryFragment2"
+            app:destination="@id/showCategoryFragment2" />
+        <action
+            android:id="@+id/action_settingCategoryFragment_to_addCategoryFragment"
+            app:destination="@id/addCategoryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/showCategoryFragment2"
+        android:name="com.example.daysmatter.ui.showCategory.ShowCategoryFragment"
+        android:label="Countdown · 倒数日"
+        tools:layout="@layout/fragment_show_category" />
+    <fragment
+        android:id="@+id/addCategoryFragment"
+        android:name="com.example.daysmatter.ui.addCategory.AddCategoryFragment"
+        android:label="fragment_add_category"
+        tools:layout="@layout/fragment_add_category" />
 </navigation>

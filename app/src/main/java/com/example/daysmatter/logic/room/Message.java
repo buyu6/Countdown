@@ -4,14 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+
+import java.io.Serializable;
 import java.util.UUID;
 
 @Entity(tableName = "message")
-public class Message {
+public class Message implements Serializable {
 
     @PrimaryKey
     @NonNull
-    private String id;
+    private String id=UUID.randomUUID().toString();;
     private String title;
     private int time;
     private String aimdate;
@@ -19,7 +21,7 @@ public class Message {
     private Integer categoryIcon;
     private String categoryName;
     @NonNull
-    private String categoryId;
+    private String categoryId="default_id";
 
     public Message() {
         this.id = UUID.randomUUID().toString();
@@ -28,19 +30,30 @@ public class Message {
         this.categoryName = null;
         this.categoryId = "";
     }
-
-    // 全参构造函数
+    // 在 Message 类中添加这个构造函数
     @Ignore
-    public Message(String title, int time, String aimdate, boolean isTop, @NonNull String id,
-                   Integer categoryIcon, String categoryName, @NonNull String categoryId) {
+    public Message(String id,String title, int time, String aimdate, boolean isTop,
+                   Integer categoryIcon, String categoryName) {
+        this.id = id;
         this.title = title;
         this.time = time;
         this.aimdate = aimdate;
         this.isTop = isTop;
-        this.id = id;
         this.categoryIcon = categoryIcon;
         this.categoryName = categoryName;
-        this.categoryId = categoryId;
+        this.categoryId = "default_id"; // 或者根据你的逻辑设置默认值
+    }
+    @Ignore
+    public Message(String title, int time, String aimdate, boolean isTop,
+                   Integer categoryIcon, String categoryName) {
+        this.id = UUID.randomUUID().toString(); // 自动生成唯一 ID
+        this.title = title;
+        this.time = time;
+        this.aimdate = aimdate;
+        this.isTop = isTop;
+        this.categoryIcon = categoryIcon;
+        this.categoryName = categoryName;
+        this.categoryId = "default_id"; // 或者根据你的逻辑设置默认值
     }
 
     @NonNull

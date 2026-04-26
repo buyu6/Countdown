@@ -15,7 +15,7 @@ public class Category {
     private String name;
     private int imageId;
     private boolean isSelected;
-    public Category(){
+    public Category(String name, int imageId){
     this.id= UUID.randomUUID().toString();
     this.name="";
     this.imageId=0;

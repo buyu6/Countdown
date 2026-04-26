@@ -11,9 +11,13 @@ import java.util.List;
 
 @Dao
 public interface MessageDao {
+    @Insert
+    void insert(Message message);
+    @Upsert
+    void upSertMessage(Message message);
     //更新或者插入
     @Upsert
-    void upSertMessage(List<Message> messages);
+    void upSertMessages(List<Message> messages);
     //删除信息
     @Delete
     void deletemessage(Message message);
