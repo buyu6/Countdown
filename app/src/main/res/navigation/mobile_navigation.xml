@@ -4,6 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
     app:startDestination="@id/launchFragemnt">
+    <action
+        android:id="@+id/action_global_showMsgFragment"
+        app:destination="@id/showMsgFragment" />
+
 
     <fragment
         android:id="@+id/navigation_home"
@@ -22,7 +26,17 @@
         android:id="@+id/navigation_dashboard"
         android:name="com.example.daysmatter.ui.dashboard.DashboardFragment"
         android:label="分类"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard" >
+        <action
+            android:id="@+id/action_navigation_dashboard_to_addCategoryFragment"
+            app:destination="@id/addCategoryFragment" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_settingCategoryFragment"
+            app:destination="@id/settingCategoryFragment" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_showCategoryFragment2"
+            app:destination="@id/showCategoryFragment2" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_notifications"
@@ -76,10 +90,14 @@
         android:id="@+id/showCategoryFragment2"
         android:name="com.example.daysmatter.ui.showCategory.ShowCategoryFragment"
         android:label="Countdown · 倒数日"
-        tools:layout="@layout/fragment_show_category" />
+        tools:layout="@layout/fragment_show_category" >
+        <action
+            android:id="@+id/action_showCategoryFragment2_to_showMsgFragment"
+            app:destination="@id/showMsgFragment" />
+    </fragment>
     <fragment
         android:id="@+id/addCategoryFragment"
         android:name="com.example.daysmatter.ui.addCategory.AddCategoryFragment"
-        android:label="fragment_add_category"
+        android:label="添加倒数日本"
         tools:layout="@layout/fragment_add_category" />
 </navigation>

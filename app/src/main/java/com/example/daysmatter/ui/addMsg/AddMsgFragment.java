@@ -44,129 +44,156 @@ public class AddMsgFragment extends Fragment {
     private MessageDao dao;
     private AddMsgViewModel mViewModel;
     private FragmentAddMsgBinding binding;
-    private int currentIconId;
-    private int result;
 
-    public static AddMsgFragment newInstance() {
-        return new AddMsgFragment();
-    }
+    // 建议在初始化时给一个默认值，防止第一次跳转传 0
+    private int currentIconId = R.drawable.life;
+    private int result;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        binding=FragmentAddMsgBinding.inflate(inflater,container,false);
+        binding = FragmentAddMsgBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Bundle b=getArguments();
-        result=b.getInt("result");
-        if(result==0){
-            init();
-        }else{
-            dao= CountdownDatabase.getDatabase(requireContext()).messageDao();
-            mViewModel=new ViewModelProvider(this).get(AddMsgViewModel.class);
-            Message msg=(Message) b.getSerializable("msg_data");
-            today=LocalDate.now();
-            id=msg.getId();
-            selectedDate=LocalDate.parse(msg.getAimdate());
-            binding.firstaddmsg.setText(msg.getTitle());
-            binding.showDate.setText(msg.getAimdate());
-            binding.switchPin.setChecked(msg.isTop());
-            binding.showIconCategoryBook.setImageResource(msg.getCategoryIcon());
-            binding.showNameCategoryBook.setText(msg.getCategoryName());
+
+        // 1. 初始化核心组件
+        dao = CountdownDatabase.getDatabase(requireContext()).messageDao();
+        mViewModel = new ViewModelProvider(this).get(AddMsgViewModel.class);
+        today = LocalDate.now();
+        getParentFragmentManager().setFragmentResultListener("category_request", getViewLifecycleOwner(), (requestKey, bundle) -> {
+            int iconId = bundle.getInt("icon_id", -1);
+            String name = bundle.getString("category_name");
+
+            if (iconId != -1 && name != null) {
+                // 关键：同步类成员变量，防止保存时变回默认
+                this.currentIconId = iconId;
+
+                // 更新 UI
+                binding.showIconCategoryBook.setImageResource(iconId);
+                binding.showNameCategoryBook.setText(name);
+
+                // 建议：移除 ImageView 的 Tint 效果，显示图标本色
+                binding.showIconCategoryBook.setImageTintList(null);
+            }
+        });
+        // 2. 处理参数与数据初始化
+        Bundle b = getArguments();
+        if (b != null) {
+            result = b.getInt("result");
+            if (result == 1) { // 编辑模式
+                Message msg = (Message) b.getSerializable("msg_data");
+                if (msg != null) {
+                    id = msg.getId();
+                    selectedDate = LocalDate.parse(msg.getAimdate());
+                    currentIconId = msg.getCategoryIcon(); // 同步图标变量
+
+                    binding.firstaddmsg.setText(msg.getTitle());
+                    binding.showDate.setText(msg.getAimdate());
+                    binding.switchPin.setChecked(msg.isTop());
+                    binding.showIconCategoryBook.setImageResource(currentIconId);
+                    binding.showNameCategoryBook.setText(msg.getCategoryName());
+                }
+            } else { // 新增模式
+                initDefault();
+            }
         }
 
         setUpObservers();
         setOnClicked();
-        getParentFragmentManager().setFragmentResultListener("category_request", this, (requestKey, bundle) -> {
+
+        // 3. 监听分类选择页面的回传
+        getParentFragmentManager().setFragmentResultListener("category_request", getViewLifecycleOwner(), (requestKey, bundle) -> {
             int iconId = bundle.getInt("icon_id", -1);
             String name = bundle.getString("category_name");
 
-            // 更新 UI
-            binding.showIconCategoryBook.setImageResource(iconId);
-            binding.showNameCategoryBook.setText(name);
+            if (iconId != -1) {
+                this.currentIconId = iconId; // 重要：同步更新变量，确保保存时 ID 正确
+                binding.showIconCategoryBook.setImageResource(iconId);
+                binding.showNameCategoryBook.setText(name);
+            }
         });
     }
-    @SuppressLint("NewApi")
-    private void init(){
 
-        dao= CountdownDatabase.getDatabase(requireContext()).messageDao();
-        mViewModel=new ViewModelProvider(this).get(AddMsgViewModel.class);
-        //获取本地时间
-        today = LocalDate.now();
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void initDefault() {
         selectedDate = LocalDate.now();
         binding.showDate.setText(today.toString());
         binding.showIconCategoryBook.setImageResource(R.drawable.life);
         binding.showNameCategoryBook.setText("生活");
+        currentIconId = R.drawable.life;
     }
-    private void setUpObservers(){
-        mViewModel.getDateDisplay().observe(getViewLifecycleOwner(),dateText->{
+
+    private void setUpObservers() {
+        mViewModel.getDateDisplay().observe(getViewLifecycleOwner(), dateText -> {
             binding.showDate.setText(dateText);
         });
-        mViewModel.getIconId().observe(getViewLifecycleOwner(),iconId->{
-            binding.showIconCategoryBook.setImageResource(iconId);
-            currentIconId=iconId;
-        });
 
+        // 如果 ViewModel 中维护了图标，则通过观察者同步
+        mViewModel.getIconId().observe(getViewLifecycleOwner(), iconId -> {
+            if (iconId != null && iconId != 0) {
+                binding.showIconCategoryBook.setImageResource(iconId);
+                currentIconId = iconId;
+            }
+        });
     }
-    //点击事件
+
     private void setOnClicked() {
-            binding.datePicker.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showDataPicker();
-                }
-            });
-            binding.insertMsg.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                        saveMsg();
-                }
-            });
-            binding.startChooseBook.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Navigation.findNavController(getView()).navigate(R.id.action_addMsgFragment_to_settingCategoryFragment);
-                }
-            });
+        binding.datePicker.setOnClickListener(v -> showDataPicker());
+
+        binding.insertMsg.setOnClickListener(v -> saveMsg());
+
+        binding.startChooseBook.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putInt("flag", 1);
+            // 确保传过去的是当前页面显示的图标 ID，用于高亮选中
+            bundle.putInt("iconId", currentIconId);
+            Navigation.findNavController(v).navigate(R.id.action_addMsgFragment_to_settingCategoryFragment, bundle);
+        });
     }
-    private void saveMsg(){
-        String title = binding.firstaddmsg.getText().toString();
-        if (title.isBlank()) {
-            Toast.makeText(requireContext(), "标题为空，请输入标题后保存", Toast.LENGTH_LONG).show();
+
+    @SuppressLint({"NewApi", "LocalSuppress"})
+    private void saveMsg() {
+        String title = binding.firstaddmsg.getText().toString().trim();
+        if (title.isEmpty()) {
+            Toast.makeText(requireContext(), "请输入标题", Toast.LENGTH_SHORT).show();
             return;
         }
-            Boolean isTop = binding.switchPin.isChecked(); // 读取置顶状态
-            @SuppressLint({"NewApi", "LocalSuppress"}) int daysBetween = (int) ChronoUnit.DAYS.between(today, selectedDate);
-            LocalDate aimDate = selectedDate;
-            if(result==1){
-                mViewModel.updateMessage(id,dao,title,isTop,aimDate,currentIconId,binding.showNameCategoryBook.getText().toString());
-            }else{
-                mViewModel.saveMessage(dao,title,isTop,aimDate,currentIconId,binding.showNameCategoryBook.getText().toString());
-            }
 
-        if (getView() != null) {
-            Bundle  bundle = new Bundle();
-            Message msg=new Message(id,title,daysBetween,aimDate.toString(),isTop,currentIconId,binding.showNameCategoryBook.getText().toString());
-            bundle.putSerializable("msg_data",msg);
-            bundle.putInt("flag",1);
-            bundle.putInt("result",1);
+        boolean isTop = binding.switchPin.isChecked();
+        String categoryName = binding.showNameCategoryBook.getText().toString();
+
+        // 计算日期差
+        int daysBetween = (int) ChronoUnit.DAYS.between(today, selectedDate);
+
+        if (result == 1) {
+            mViewModel.updateMessage(id, dao, title, isTop, selectedDate, currentIconId, categoryName);
+        } else {
+            mViewModel.saveMessage(dao, title, isTop, selectedDate, currentIconId, categoryName);
+        }
+
+        // 4. 数据回传给上一个页面并关闭
+        if (isAdded() && getView() != null) {
+            Bundle bundle = new Bundle();
+            Message msg = new Message(id, title, daysBetween, selectedDate.toString(), isTop, currentIconId, categoryName);
+            bundle.putSerializable("msg_data", msg);
+            bundle.putInt("result", 1);
+
             getParentFragmentManager().setFragmentResult("edit_msg_result", bundle);
             Navigation.findNavController(getView()).popBackStack();
         }
-
     }
-    //时间选择器
+
+    @SuppressLint({"NewApi", "LocalSuppress"})
     private void showDataPicker() {
-        @SuppressLint({"NewApi", "LocalSuppress"}) DatePickerDialog dialog = new DatePickerDialog(
+        DatePickerDialog dialog = new DatePickerDialog(
                 requireActivity(),
                 (view, year, month, dayOfMonth) -> {
-                    LocalDate newDate = LocalDate.of(year, month + 1, dayOfMonth);
-                    this.selectedDate = newDate;
-                    // 将结果交给 ViewModel 处理
+                    selectedDate = LocalDate.of(year, month + 1, dayOfMonth);
                     mViewModel.updateDate(year, month, dayOfMonth);
                 },
                 selectedDate.getYear(),
@@ -175,5 +202,4 @@ public class AddMsgFragment extends Fragment {
         );
         dialog.show();
     }
-
 }

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="76dp"
+    android:layout_height="76dp"
+    android:padding="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackgroundBorderless">
+
+    <!-- 图标容器 -->
+    <LinearLayout
+        android:id="@+id/iconContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="10dp"
+        android:background="@drawable/bg_icon_card"
+        android:elevation="2dp">
+
+        <ImageView
+            android:id="@+id/iconImage"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:scaleType="fitCenter"
+            app:tint="#4A90E2"
+            tools:ignore="ContentDescription" />
+
+    </LinearLayout>
+
+    <!-- 选中标记 -->
+    <ImageView
+        android:id="@+id/selectedOverlay"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="top|end"
+        android:padding="4dp"
+        android:src="@drawable/ic_check_circle"
+        android:background="@drawable/bg_icon_selected"
+        app:tint="@color/white"
+        android:elevation="4dp"
+        android:visibility="gone"
+        tools:ignore="ContentDescription" />
+
+</FrameLayout>

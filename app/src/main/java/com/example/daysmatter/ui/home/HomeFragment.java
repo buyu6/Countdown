@@ -105,4 +105,16 @@ public class HomeFragment extends Fragment {
             homeViewModel.loadMessagesByCategory(category);
         }
     }
+    public void loadAllMessages() {
+        if (homeViewModel != null) {
+            homeViewModel.loadMessages();
+        }
+    }
+
+    // 供 MainActivity 调用
+    public void onCategorySelected(String category) {
+        if (homeViewModel != null) {
+            homeViewModel.loadMessagesByCategory(category);
+        }
+    }
 }

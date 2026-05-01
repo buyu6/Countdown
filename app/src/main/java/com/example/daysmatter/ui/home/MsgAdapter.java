@@ -61,7 +61,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
                     bundle.putInt("flag",flag);
                     bundle.putSerializable("msg_data", msg);
                     bundle.putInt("result",0);
-                    Navigation.findNavController(itemView).navigate(R.id.action_navigation_home_to_showMsgFragment,bundle);
+                    Navigation.findNavController(itemView).navigate(R.id.action_global_showMsgFragment,bundle);
                 }
             });
 
